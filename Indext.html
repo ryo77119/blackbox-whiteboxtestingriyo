@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Combined Black Box & White Box Testing - Diskon Belanja</title>
+  <style>
+    :root {
+      --bg-dark: #0B0F19;
+      --card-bg: #13192B;
+      --border-color: #252E4A;
+      --accent-purple: #8B5CF6;
+      --accent-blue: #3B82F6;
+      --neon-green: #10B981;
+      --danger-red: #EF4444;
+      --warning-amber: #F59E0B;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1E1B4B, var(--bg-dark) 65%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    header h1 {
+      font-size: 1.85rem;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--neon-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.6rem;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    input[type="number"] {
+      flex: 1;
+      padding: 0.7rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent-purple);
+    }
+
+    .btn {
+      padding: 0.7rem 1.05rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-combined {
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+      color: #fff;
+    }
+
+    .btn-suite {
+      background-color: var(--neon-green);
+      color: #064E3B;
+    }
+
+    .btn-reset {
+      background-color: #273252;
+      color: var(--text-main);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.4rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .card h2 {
+      font-size: 1.12rem;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bb-title {
+      color: var(--accent-blue);
+    }
+
+    .wb-title {
+      color: var(--neon-green);
+    }
+
+    .synergy-title {
+      color: var(--accent-purple);
+    }
+
+    .status-box {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-blue);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .status-box.pass {
+      border-left-color: var(--neon-green);
+    }
+
+    .status-box.reject {
+      border-left-color: var(--danger-red);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    th, td {
+      padding: 0.65rem 0.55rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      color: var(--text-muted);
+      background-color: rgba(11, 15, 25, 0.5);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .badge-pending {
+      background-color: #374151;
+      color: #D1D5DB;
+    }
+
+    .badge-pass {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: var(--neon-green);
+      border: 1px solid var(--neon-green);
+    }
+
+    .badge-fail {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: var(--danger-red);
+      border: 1px solid var(--danger-red);
+    }
+
+    .code-block {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.83rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin-bottom: 0.9rem;
+    }
+
+    .code-line {
+      display: flex;
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      border-left: 3px solid transparent;
+    }
+
+    .line-num {
+      color: var(--text-muted);
+      width: 2rem;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .code-line.executed {
+      background-color: rgba(16, 185, 129, 0.14);
+      border-left-color: var(--neon-green);
+    }
+
+    .code-line.active-branch {
+      background-color: rgba(139, 92, 246, 0.25);
+      border-left-color: var(--accent-purple);
+    }
+
+    .coverage-grid {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .coverage-row {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 7px;
+      padding: 0.6rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.83rem;
+    }
+
+    .synergy-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 860px) {
+      .synergy-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .synergy-item {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-top: 3px solid var(--accent-purple);
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .synergy-item strong {
+      display: block;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+    }
+
+    .student-info {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Combined Black Box &amp; White Box Testing</h1>
+      <p>Eksekusi Terpadu Fungsionalitas &amp; Logika Percabangan Diskon — Tugas 2 STQA</p>
+    </header>
+
+    <!-- Toolbar Eksekusi Gabungan -->
+    <div class="toolbar">
+      <div class="input-group">
+        <input type="number" id="belanjaInput" placeholder="Masukkan total belanja (misal: 500000 atau -10000)" />
+        <button class="btn btn-combined" onclick="jalankanGabunganSingle()">Jalankan BB + WB</button>
+      </div>
+      <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+        <button class="btn btn-suite" onclick="jalankanFullSuite()">Jalankan Semua Test Case (TC-01 s.d. TC-05)</button>
+        <button class="btn btn-reset" onclick="resetSemua()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Grid Utama: Kiri Black Box, Kanan White Box -->
+    <div class="grid">
+      <!-- Black Box Panel -->
+      <div class="card">
+        <h2 class="bb-title">
+          <span>1. Black Box Testing (Input / Output)</span>
+          <span class="badge badge-pending" id="bbCounter">0 / 5 PASS</span>
+        </h2>
+
+        <div class="status-box" id="bbStatusBox">
+          <strong>Hasil Fungsional:</strong> Belum ada input yang dijalankan.
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Input</th>
+                <th>Expected</th>
+                <th>Actual</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="bbTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- White Box Panel -->
+      <div class="card">
+        <h2 class="wb-title">
+          <span>2. White Box Testing (Code &amp; Branch)</span>
+          <span class="badge badge-pending" id="wbCounter">0 / 3 JALUR</span>
+        </h2>
+
+        <div class="status-box" id="wbStatusBox">
+          <strong>Jalur Aktif:</strong> Menunggu eksekusi kode percabangan.
+        </div>
+
+        <div class="code-block" id="codeView"></div>
+
+        <div class="coverage-grid">
+          <div class="coverage-row">
+            <span><strong>Jalur 1:</strong> total_belanja &lt; 0 (Ditolak)</span>
+            <span class="badge badge-pending" id="branch-1">BELUM</span>
+          </div>
+          <div class="coverage-row">
+            <span><strong>Jalur 2:</strong> total_belanja &gt;= 500.000 (Diskon 10%)</span>
+            <span class="badge badge-pending" id="branch-2">BELUM</span>
+          </div>
+          <div class="coverage-row">
+            <span><strong>Jalur 3:</strong> 0 &lt;= total_belanja &lt; 500.000 (Normal)</span>
+            <span class="badge badge-pending" id="branch-3">BELUM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+    <div class="student-info">
+      Nama: <strong>Riyo Wahyu Saputra</strong> | NPM: <strong>2470111079</strong>
+    </div>
+  </div>
+
+  <script>
+    const codeLines = [
+      "function hitungPembayaran(totalBelanja) {",
+      "  if (totalBelanja < 0) {",
+      '    return { ok: false, text: "Transaksi ditolak (negatif)" };',
+      "  } else if (totalBelanja >= 500000) {",
+      "    const bayar = totalBelanja - (totalBelanja * 0.10);",
+      '    return { ok: true, text: "Diskon 10%, Bayar " + rp(bayar) };',
+      "  } else {",
+      '    return { ok: true, text: "Tanpa diskon, Bayar " + rp(totalBelanja) };',
+      "  }",
+      "}"
+    ];
+
+    const testCases = [
+      { id: "TC-01", input: -50000, expected: "Transaksi ditolak (negatif)" },
+      { id: "TC-02", input: 0, expected: "Tanpa diskon, Bayar Rp0" },
+      { id: "TC-03", input: 499999, expected: "Tanpa diskon, Bayar Rp499.999" },
+      { id: "TC-04", input: 500000, expected: "Diskon 10%, Bayar Rp450.000" },
+      { id: "TC-05", input: 750000, expected: "Diskon 10%, Bayar Rp675.000" }
+    ];
+
+    let executedSet = new Set();
+    let coveredBranches = new Set();
+    let passedCases = new Set();
+
+    function formatRp(num) {
+      const sign = num < 0 ? "-" : "";
+      return sign + "Rp" + Math.abs(num).toLocaleString("id-ID");
+    }
+
+    function sutHitung(totalBelanja) {
+      if (totalBelanja < 0) {
+        return {
+          ok: false,
+          branch: 1,
+          activeLines: [1, 2, 3, 10],
+          output: "Transaksi ditolak (negatif)"
+        };
+      } else if (totalBelanja >= 500000) {
+        const bayar = totalBelanja - totalBelanja * 0.1;
+        return {
+          ok: true,
+          branch: 2,
+          activeLines: [1, 2, 4, 5, 6, 10],
+          output: `Diskon 10%, Bayar ${formatRp(bayar)}`
+        };
+      } else {
+        return {
+          ok: true,
+          branch: 3,
+          activeLines: [1, 2, 4, 7, 8, 10],
+          output: `Tanpa diskon, Bayar ${formatRp(totalBelanja)}`
+        };
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("bbTableBody");
+      tbody.innerHTML = "";
+      testCases.forEach((tc, idx) => {
+        const isPass = passedCases.has(idx);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${tc.id}</strong></td>
+          <td>${formatRp(tc.input)}</td>
+          <td>${tc.expected}</td>
+          <td id="bb-actual-${idx}">-</td>
+          <td id="bb-status-${idx}"><span class="badge ${isPass ? "badge-pass" : "badge-pending"}">${isPass ? "PASS" : "PENDING"}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderCode(activeArr = []) {
+      const activeSet = new Set(activeArr);
+      const view = document.getElementById("codeView");
+      view.innerHTML = "";
+      codeLines.forEach((line, i) => {
+        const lineNum = i + 1;
+        const div = document.createElement("div");
+        div.className = "code-line";
+        if (executedSet.has(lineNum)) div.classList.add("executed");
+        if (activeSet.has(lineNum)) div.classList.add("active-branch");
+        div.innerHTML = `<span class="line-num">${lineNum}</span><span>${line.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
+        view.appendChild(div);
+      });
+    }
+
+    function updateCounters() {
+      document.getElementById("bbCounter").textContent = `${passedCases.size} / ${testCases.length} PASS`;
+      document.getElementById("wbCounter").textContent = `${coveredBranches.size} / 3 JALUR`;
+
+      coveredBranches.forEach((b) => {
+        const el = document.getElementById(`branch-${b}`);
+        el.textContent = "COVERED";
+        el.className = "badge badge-pass";
+      });
+    }
+
+    function eksekusiGabungan(val) {
+      if (isNaN(val)) {
+        alert("Silakan masukkan angka total belanja yang valid.");
+        return;
+      }
+
+      const hasil = sutHitung(val);
+      hasil.activeLines.forEach((l) => executedSet.add(l));
+      coveredBranches.add(hasil.branch);
+
+      // Update panel Black Box
+      const bbBox = document.getElementById("bbStatusBox");
+      bbBox.className = `status-box ${hasil.ok ? "pass" : "reject"}`;
+      bbBox.innerHTML = `<strong>Input ${formatRp(val)}:</strong> ${hasil.output}`;
+
+      // Cocokkan dengan test case jika ada
+      testCases.forEach((tc, idx) => {
+        if (tc.input === val) {
+          const match = hasil.output === tc.expected;
+          if (match) passedCases.add(idx);
+          document.getElementById(`bb-actual-${idx}`).textContent = hasil.output;
+          document.getElementById(`bb-status-${idx}`).innerHTML = match
+            ? `<span class="badge badge-pass">PASS</span>`
+            : `<span class="badge badge-fail">FAIL</span>`;
+        }
+      });
+
+      // Update panel White Box
+      const wbBox = document.getElementById("wbStatusBox");
+      wbBox.className = `status-box ${hasil.ok ? "pass" : "reject"}`;
+      wbBox.innerHTML = `<strong>Jalur ${hasil.branch} Terpicu:</strong> Baris [${hasil.activeLines.join(", ")}] dieksekusi.`;
+
+      renderCode(hasil.activeLines);
+      updateCounters();
+    }
+
+    function jalankanGabunganSingle() {
+      const val = parseFloat(document.getElementById("belanjaInput").value);
+      eksekusiGabungan(val);
+    }
+
+    function jalankanFullSuite() {
+      testCases.forEach((tc, index) => {
+        setTimeout(() => {
+          document.getElementById("belanjaInput").value = tc.input;
+          eksekusiGabungan(tc.input);
+        }, index * 450);
+      });
+    }
+
+    function resetSemua() {
+      executedSet = new Set();
+      coveredBranches = new Set();
+      passedCases = new Set();
+      document.getElementById("belanjaInput").value = "";
+      document.getElementById("bbStatusBox").className = "status-box";
+      document.getElementById("bbStatusBox").innerHTML = "<strong>Hasil Fungsional:</strong> Belum ada input yang dijalankan.";
+      document.getElementById("wbStatusBox").className = "status-box";
+      document.getElementById("wbStatusBox").innerHTML = "<strong>Jalur Aktif:</strong> Menunggu eksekusi kode percabangan.";
+      [1, 2, 3].forEach((b) => {
+        const el = document.getElementById(`branch-${b}`);
+        el.textContent = "BELUM";
+        el.className = "badge badge-pending";
+      });
+      renderTable();
+      renderCode();
+      updateCounters();
+    }
+
+    renderTable();
+    renderCode();
+    updateCounters();
+  </script>
+</body>
+</html>
